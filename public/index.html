@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestionnaire d'Interventions Securitas</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-graph/3.0.0/microsoft-graph.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #003366;
+            --secondary-color: #ff6600;
+            --background-color: #f8f9fa;
+            --card-color: #ffffff;
+            --border-color: #dee2e6;
+            --text-color: #333333;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .btn {
+            display: inline-block;
+            font-weight: 500;
+            text-align: center;
+            vertical-align: middle;
+            cursor: pointer;
+            border: 1px solid transparent;
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            border-radius: 0.25rem;
+            transition: all 0.15s ease-in-out;
+        }
+
+        .btn-primary {
+            color: #fff;
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn-secondary {
+            color: #fff;
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+
+        .btn-success {
+            color: #fff;
+            background-color: var(--success-color);
+            border-color: var(--success-color);
+        }
+
+        .btn-danger {
+            color: #fff;
+            background-color: var(--danger-color);
+            border-color: var(--danger-color);
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .card {
+            background-color: var(--card-color);
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            padding: 20px;
+        }
+
+        .card-title {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            display: block;
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            color: var(--text-color);
+            background-color: #fff;
+            background-clip: padding-box;
+            border: 1px solid var(--border-color);
+            border-radius: 0.25rem;
+            transition: border-color 0.15s ease-in-out;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            outline: 0;
+        }
+
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+        }
+
+        .alert-success {
+            color: #155724;
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+
+        .alert-danger {
+            color: #721c24;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+
+        .alert-warning {
+            color: #856404;
+            background-color: #fff3cd;
+            border-color: #ffeeba;
+        }
+
+        .alert-info {
+            color: #0c5460;
+            background-color: #d1ecf1;
+            border-color: #bee5eb;
+        }
+
+        .hide {
+            display: none;
+        }
+
+        .email-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .email-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .email-item:hover {
+            background-color: rgba(0, 0, 0, 0.03);
+        }
+
+        .email-info {
+            flex: 1;
+        }
+
+        .email-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .timer-display {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-top: 10px;
+            text-align: center;
+        }
+        
+        .tab-container {
+            margin-bottom: 20px;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            border-bottom: none;
+            border-radius: 5px 5px 0 0;
+            background-color: #f1f1f1;
+            margin-right: 5px;
+        }
+        
+        .tab.active {
+            background-color: var(--card-color);
+            border-color: var(--border-color);
+            border-bottom-color: var(--card-color);
+            margin-bottom: -1px;
+            font-weight: bold;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+            background-color: var(--card-color);
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 2s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Gestionnaire d'Interventions Securitas</h1>
+            <div>
+                <button id="btnConnect" class="btn btn-secondary">Se connecter à Outlook</button>
+                <button id="btnRefresh" class="btn btn-primary hide">Actualiser les emails</button>
+                <span id="connectedUser" class="hide" style="color: white; margin-left: 10px;"></span>
+            </div>
+        </header>
+
+        <div id="alertContainer"></div>
+
+        <div class="tab-container">
+            <div class="tabs">
+                <div id="tabEmails" class="tab active">Emails</div>
+                <div id="tabIntervention" class="tab">Intervention en cours</div>
+                <div id="tabConfig" class="tab">Configuration</div>
+            </div>
+            
+            <div id="contentEmails" class="tab-content active">
+                <div class="card">
+                    <h2 class="card-title">Emails avec Fichiers d'Intervention</h2>
+                    <div id="emailLoader" class="loader hide"></div>
+                    <div id="emailList" class="email-list">
+                        <p>Connectez-vous à votre compte Outlook pour voir les emails contenant des fichiers d'intervention.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="contentIntervention" class="tab-content">
+                <div class="card">
+                    <h2 class="card-title">Détails de l'Intervention</h2>
+                    <div id="interventionDetails">
+                        <p>Aucune intervention en cours. Sélectionnez un fichier d'intervention depuis l'onglet Emails.</p>
+                    </div>
+                    
+                    <div id="interventionForm" class="hide">
+                        <div class="form-group">
+                            <label for="sinoffCode">SinoffCode (000-999):</label>
+                            <input type="number" id="sinoffCode" class="form-control" min="0" max="999" step="1" placeholder="Entrez un code à 3 chiffres">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Début d'intervention:</label>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <input type="number" id="startDay" class="form-control" placeholder="Jour" min="1" max="31" style="width: 80px;">
+                                <select id="startMonth" class="form-control" style="width: 120px;">
+                                    <option value="1">Janvier</option>
+                                    <option value="2">Février</option>
+                                    <option value="3">Mars</option>
+                                    <option value="4">Avril</option>
+                                    <option value="5">Mai</option>
+                                    <option value="6">Juin</option>
+                                    <option value="7">Juillet</option>
+                                    <option value="8">Août</option>
+                                    <option value="9">Septembre</option>
+                                    <option value="10">Octobre</option>
+                                    <option value="11">Novembre</option>
+                                    <option value="12">Décembre</option>
+                                </select>
+                                <input type="number" id="startHour" class="form-control" placeholder="Heure" min="0" max="23" style="width: 80px;">
+                                <input type="number" id="startMinute" class="form-control" placeholder="Minute" min="0" max="59" style="width: 80px;">
+                                <button id="btnStartNow" class="btn btn-primary">Heure Actuelle</button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Fin d'intervention:</label>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <input type="number" id="endDay" class="form-control" placeholder="Jour" min="1" max="31" style="width: 80px;">
+                                <select id="endMonth" class="form-control" style="width: 120px;">
+                                    <option value="1">Janvier</option>
+                                    <option value="2">Février</option>
+                                    <option value="3">Mars</option>
+                                    <option value="4">Avril</option>
+                                    <option value="5">Mai</option>
+                                    <option value="6">Juin</option>
+                                    <option value="7">Juillet</option>
+                                    <option value="8">Août</option>
+                                    <option value="9">Septembre</option>
+                                    <option value="10">Octobre</option>
+                                    <option value="11">Novembre</option>
+                                    <option value="12">Décembre</option>
+                                </select>
+                                <input type="number" id="endHour" class="form-control" placeholder="Heure" min="0" max="23" style="width: 80px;">
+                                <input type="number" id="endMinute" class="form-control" placeholder="Minute" min="0" max="59" style="width: 80px;">
+                                <button id="btnEndNow" class="btn btn-primary">Heure Actuelle</button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="interventionDetails">Détails de l'intervention:</label>
+                            <textarea id="interventionDetails" class="form-control" rows="4" placeholder="Entrez les détails de l'intervention"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="interventionSolution">Explications et solutions:</label>
+                            <textarea id="interventionSolution" class="form-control" rows="4" placeholder="Entrez les explications et solutions"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <button id="btnSaveIntervention" class="btn btn-success">Enregistrer et Envoyer</button>
+                            <button id="btnCancelIntervention" class="btn btn-danger">Annuler</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="contentConfig" class="tab-content">
+                <div class="card">
+                    <h2 class="card-title">Configuration</h2>
+                    <div class="form-group">
+                        <label for="targetEmail">Email de destination:</label>
+                        <input type="email" id="targetEmail" class="form-control" value="fortistech.brussels@securitas.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="filePrefix">Préfixe des fichiers:</label>
+                        <input type="text" id="filePrefix" class="form-control" value="WS-">
+                    </div>
+                    
+                    <div class="form-group">
+                        <button id="btnSaveConfig" class="btn btn-success">Enregistrer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // État de l'application
+        const appState = {
+            isAuthenticated: false,
+            emails: [],
+            currentFile: null,
+            config: {
+                targetEmail: 'fortistech.brussels@securitas.com',
+                filePrefix: 'WS-'
+            }
+        };
+
+        // Éléments DOM
+        const elements = {
+            btnConnect: document.getElementById('btnConnect'),
+            btnRefresh: document.getElementById('btnRefresh'),
+            connectedUser: document.getElementById('connectedUser'),
+            emailList: document.getElementById('emailList'),
+            emailLoader: document.getElementById('emailLoader'),
+            alertContainer: document.getElementById('alertContainer'),
+            interventionDetails: document.getElementById('interventionDetails'),
+            interventionForm: document.getElementById('interventionForm'),
+            sinoffCode: document.getElementById('sinoffCode'),
+            startDay: document.getElementById('startDay'),
+            startMonth: document.getElementById('startMonth'),
+            startHour: document.getElementById('startHour'),
+            startMinute: document.getElementById('startMinute'),
+            btnStartNow: document.getElementById('btnStartNow'),
+            endDay: document.getElementById('endDay'),
+            endMonth: document.getElementById('endMonth'),
+            endHour: document.getElementById('endHour'),
+            endMinute: document.getElementById('endMinute'),
+            btnEndNow: document.getElementById('btnEndNow'),
+            interventionDetailsText: document.getElementById('interventionDetails'),
+            interventionSolution: document.getElementById('interventionSolution'),
+            btnSaveIntervention: document.getElementById('btnSaveIntervention'),
+            btnCancelIntervention: document.getElementById('btnCancelIntervention'),
+            targetEmail: document.getElementById('targetEmail'),
+            filePrefix: document.getElementById('filePrefix'),
+            btnSaveConfig: document.getElementById('btnSaveConfig'),
+            tabEmails: document.getElementById('tabEmails'),
+            tabIntervention: document.getElementById('tabIntervention'),
+            tabConfig: document.getElementById('tabConfig'),
+            contentEmails: document.getElementById('contentEmails'),
+            contentIntervention: document.getElementById('contentIntervention'),
+            contentConfig: document.getElementById('contentConfig')
+        };
+
+        // Configuration pour l'API
+        const apiBaseUrl = window.location.origin + '/api';
+
+        // Initialisation
+        function init() {
+            // Chargement de la configuration depuis localStorage
+            const savedConfig = localStorage.getItem('appConfig');
+            if (savedConfig) {
+                appState.config = JSON.parse(savedConfig);
+                elements.targetEmail.value = appState.config.targetEmail;
+                elements.filePrefix.value = appState.config.filePrefix;
+            }
+
+            // Gestion des onglets
+            elements.tabEmails.addEventListener('click', () => switchTab('Emails'));
+            elements.tabIntervention.addEventListener('click', () => switchTab('Intervention'));
+            elements.tabConfig.addEventListener('click', () => switchTab('Config'));
+
+            // Événements des boutons
+            elements.btnConnect.addEventListener('click', authenticateUser);
+            elements.btnRefresh.addEventListener('click', fetchEmails);
+            elements.btnStartNow.addEventListener('click', setCurrentTimeStart);
+            elements.btnEndNow.addEventListener('click', setCurrentTimeEnd);
+            elements.btnSaveIntervention.addEventListener('click', saveAndSendIntervention);
+            elements.btnCancelIntervention.addEventListener('click', cancelIntervention);
+            elements.btnSaveConfig.addEventListener('click', saveConfiguration);
+
+            // Vérifier si l'utilisateur est déjà authentifié
+            checkAuthStatus();
+        }
+
+        // Fonctions d'authentification
+        async function authenticateUser() {
+            showAlert('Connexion au serveur de messagerie...', 'info');
+            elements.emailLoader.classList.remove('hide');
+            
+            // Demander les identifiants
+            const email = prompt('Adresse email:');
+            const password = prompt('Mot de passe ou mot de passe d\'application:');
+            
+            if (!email || !password) {
+                elements.emailLoader.classList.add('hide');
+                showAlert('Authentification annulée.', 'warning');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${apiBaseUrl}/authenticate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    // Stocker les identifiants dans sessionStorage (pas en production sans HTTPS)
+                    sessionStorage.setItem('emailCredentials', JSON.stringify({ email, password }));
+                    
+                    appState.isAuthenticated = true;
+                    elements.btnConnect.classList.add('hide');
+                    elements.btnRefresh.classList.remove('hide');
+                    elements.connectedUser.textContent = `Connecté: ${email}`;
+                    elements.connectedUser.classList.remove('hide');
+                    
+                    showAlert('Connexion réussie!', 'success');
+                    fetchEmails();
+                } else {
+                    showAlert(`Échec de l'authentification: ${data.error || 'Erreur inconnue'}`, 'danger');
+                }
+            } catch (error) {
+                console.error('Erreur lors de l\'authentification:', error);
+                showAlert('Erreur de connexion au serveur', 'danger');
+            } finally {
+                elements.emailLoader.classList.add('hide');
+            }
+        }
+
+        function checkAuthStatus() {
+            const credentials = sessionStorage.getItem('emailCredentials');
+            if (credentials) {
+                const { email } = JSON.parse(credentials);
+                appState.isAuthenticated = true;
+                elements.btnConnect.classList.add('hide');
+                elements.btnRefresh.classList.remove('hide');
+                elements.connectedUser.textContent = `Connecté: ${email}`;
+                elements.connectedUser.classList.remove('hide');
+                fetchEmails();
+            }
+        }
+
+        // Gestion des emails
+        async function fetchEmails() {
+            if (!appState.isAuthenticated) {
+                showAlert('Veuillez vous connecter d\'abord', 'warning');
+                return;
+            }
+
+            const credentials = JSON.parse(sessionStorage.getItem('emailCredentials'));
+            if (!credentials) {
+                showAlert('Session expirée, veuillez vous reconnecter', 'warning');
+                return;
+            }
+
+            showAlert('Recherche des emails non lus avec fichiers d\'intervention...', 'info');
+            elements.emailLoader.classList.remove('hide');
+            elements.emailList.innerHTML = '';
+
+            try {
+                const response = await fetch(`${apiBaseUrl}/fetch-emails`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: credentials.email,
+                        password: credentials.password,
+                        filePrefix: appState.config.filePrefix
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    appState.emails = data.emails;
+                    renderEmailList();
+                    showAlert(`${data.emails.length} email(s) trouvé(s)`, 'success');
+                } else {
+                    showAlert(`Échec de la récupération des emails: ${data.error || 'Erreur inconnue'}`, 'danger');
+                }
+            } catch (error) {
+                console.error('Erreur lors de la récupération des emails:', error);
+                showAlert('Erreur de connexion au serveur', 'danger');
+            } finally {
+                elements.emailLoader.classList.add('hide');
+            }
+        }
+
+        function renderEmailList() {
+            if (appState.emails.length === 0) {
+                elements.emailList.innerHTML = '<p>Aucun email avec fichier d\'intervention trouvé.</p>';
+                return;
+            }
+
+            let html = '';
+            appState.emails.forEach(email => {
+                const date = new Date(email.date);
+                
+                html += `
+                    <div class="email-item">
+                        <div class="email-info">
+                            <strong>${email.subject}</strong><br>
+                            De: ${email.from}<br>
+                            Reçu: ${date.toLocaleString()}<br>
+                            Pièces jointes: ${email.attachments.map(a => a.filename).join(', ')}
+                        </div>
+                        <div class="email-actions">
+                            ${email.attachments.map(att => `
+                                <button class="btn btn-secondary" onclick="downloadAttachment('${email.id}', '${att.partID}', '${att.filename}')">Télécharger</button>
+                                <button class="btn btn-success" onclick="acceptIntervention('${email.id}', '${att.partID}', '${att.filename}')">Accepter</button>
+                            `).join('')}
+                            <button class="btn btn-danger" onclick="rejectIntervention('${email.id}')">Rejeter</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            elements.emailList.innerHTML = html;
+        }
+
+        // Manipulation des fichiers Excel
+        async function downloadAttachment(emailId, partId, filename) {
+            showAlert(`Téléchargement de ${filename}...`, 'info');
+            
+            const credentials = JSON.parse(sessionStorage.getItem('emailCredentials'));
+            if (!credentials) {
+                showAlert('Session expirée, veuillez vous reconnecter', 'warning');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${apiBaseUrl}/download-attachment`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: credentials.email,
+                        password: credentials.password,
+                        emailId,
+                        partId,
+                        filename
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    // Créer un lien de téléchargement
+                    const link = document.createElement('a');
+                    link.href = `/download?file=${encodeURIComponent(data.filePath)}`;
+                    link.download = filename;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    
+                    showAlert('Téléchargement réussi', 'success');
+                } else {
+                    showAlert(`Échec du téléchargement: ${data.error || 'Erreur inconnue'}`, 'danger');
+                }
+            } catch (error) {
+                console.error('Erreur lors du téléchargement:', error);
+                showAlert('Erreur de connexion au serveur', 'danger');
+            }
+        }
+
+        async function acceptIntervention(emailId, partId, filename) {
+            showAlert(`Acceptation de l'intervention ${filename}...`, 'info');
+            
+            const credentials = JSON.parse(sessionStorage.getItem('emailCredentials'));
+            if (!credentials) {
+                showAlert('Session expirée, veuillez vous reconnecter', 'warning');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${apiBaseUrl}/download-attachment`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: credentials.email,
+                        password: credentials.password,
+                        emailId,
+                        partId,
+                        filename
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    appState.currentFile = {
+                        name: filename,
+                        emailId: emailId,
+                        partId: partId,
+                        path: data.filePath
+                    };
+                    
+                    showAlert(`Intervention ${filename} acceptée. Veuillez compléter les détails.`, 'success');
+                    switchTab('Intervention');
+                    
+                    // Préremplir avec la date actuelle
+                    const now = new Date();
+                    elements.startDay.value = now.getDate();
+                    elements.startMonth.value = now.getMonth() + 1;
+                    elements.startHour.value = now.getHours();
+                    elements.startMinute.value = now.getMinutes();
+                    
+                    elements.endDay.value = now.getDate();
+                    elements.endMonth.value = now.getMonth() + 1;
+                    
+                    // Afficher le formulaire d'intervention
+                    elements.interventionDetails.classList.add('hide');
+                    elements.interventionForm.classList.remove('hide');
+                } else {
+                    showAlert(`Échec de l'acceptation: ${data.error || 'Erreur inconnue'}`, 'danger');
+                }
+            } catch (error) {
+                console.error('Erreur lors de l\'acceptation:', error);
+                showAlert('Erreur de connexion au serveur', 'danger');
+            }
+        }
+
+        async function rejectIntervention(emailId) {
+            if (confirm('Êtes-vous sûr de vouloir rejeter cette intervention?')) {
+                showAlert(`Rejet de l'intervention...`, 'info');
+                
+                const credentials = JSON.parse(sessionStorage.getItem('emailCredentials'));
+                if (!credentials) {
+                    showAlert('Session expirée, veuillez vous reconnecter', 'warning');
+                    return;
+                }
+                
+                try {
+                    const response = await fetch(`${apiBaseUrl}/mark-as-read`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            email: credentials.email,
+                            password: credentials.password,
+                            emailId
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok && data.success) {
+                        showAlert(`Intervention rejetée avec succès.`, 'success');
+                        
+                        // Supprimer l'email de la liste
+                        appState.emails = appState.emails.filter(email => email.id !== emailId);
+                        renderEmailList();
+                    } else {
+                        showAlert(`Échec du rejet: ${data.error || 'Erreur inconnue'}`, 'danger');
+                    }
+                } catch (error) {
+                    console.error('Erreur lors du rejet:', error);
+                    showAlert('Erreur de connexion au serveur', 'danger');
+                }
+            }
+        }
+
+        async function saveAndSendIntervention() {
+            if (!appState.currentFile) {
+                showAlert('Aucune intervention en cours.', 'warning');
+                return;
+            }
+            
+            // Validation des données
+            const sinoffCode = elements.sinoffCode.value;
+            if (!sinoffCode || sinoffCode < 0 || sinoffCode > 999) {
+                showAlert('Le SinoffCode doit être un nombre entre 000 et 999.', 'warning');
+                return;
+            }
+            
+            // Récupération des valeurs du formulaire
+            const formData = new FormData();
+            formData.append('file', appState.currentFile.path);
+            formData.append('sinoffCode', sinoffCode);
+            formData.append('startDay', elements.startDay.value);
+            formData.append('startMonth', elements.startMonth.value);
+            formData.append('startHour', elements.startHour.value);
+            formData.append('startMinute', elements.startMinute.value);
+            formData.append('endDay', elements.endDay.value);
+            formData.append('endMonth', elements.endMonth.value);
+            formData.append('endHour', elements.endHour.value);
+            formData.append('endMinute', elements.endMinute.value);
+            formData.append('details', elements.interventionDetailsText.value);
+            formData.append('solution', elements.interventionSolution.value);
+
+            showAlert('Traitement du fichier Excel...', 'info');
+            
+            try {
+                // Traiter le fichier Excel
+                const processResponse = await fetch(`${apiBaseUrl}/process-excel`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const processData = await processResponse.json();
+                
+                if (!processResponse.ok || !processData.success) {
+                    throw new Error(processData.error || 'Erreur lors du traitement du fichier');
+                }
+                
+                // Envoyer l'email
+                const credentials = JSON.parse(sessionStorage.getItem('emailCredentials'));
+                
+                const emailFormData = new FormData();
+                emailFormData.append('file', processData.filePath);
+                emailFormData.append('email', credentials.email);
+                emailFormData.append('password', credentials.password);
+                emailFormData.append('recipient', appState.config.targetEmail);
+                emailFormData.append('subject', `Intervention complétée - ${appState.currentFile.name}`);
+                emailFormData.append('body', `Intervention complétée.\n\nDétails: ${elements.interventionDetailsText.value}\n\nSolution: ${elements.interventionSolution.value}`);
+                
+                showAlert('Envoi de l\'email...', 'info');
+                
+                const sendResponse = await fetch(`${apiBaseUrl}/send-email`, {
+                    method: 'POST',
+                    body: emailFormData
+                });
+                
+                const sendData = await sendResponse.json();
+                
+                if (sendResponse.ok && sendData.success) {
+                    // Marquer l'email comme lu
+                    await fetch(`${apiBaseUrl}/mark-as-read`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            email: credentials.email,
+                            password: credentials.password,
+                            emailId: appState.currentFile.emailId
+                        })
+                    });
+                    
+                    showAlert('Intervention enregistrée et envoyée avec succès à ' + appState.config.targetEmail, 'success');
+                    
+                    // Réinitialiser le formulaire
+                    appState.currentFile = null;
+                    elements.interventionForm.classList.add('hide');
+                    elements.interventionDetails.classList.remove('hide');
+                    elements.interventionDetails.innerHTML = '<p>Aucune intervention en cours. Sélectionnez un fichier d\'intervention depuis l\'onglet Emails.</p>';
+                    
+                    // Retour à l'onglet Emails et rafraîchir
+                    switchTab('Emails');
+                    fetchEmails();
+                } else {
+                    showAlert(`Échec de l'envoi: ${sendData.error || 'Erreur inconnue'}`, 'danger');
+                }
+            } catch (error) {
+                console.error('Erreur lors du traitement/envoi:', error);
+                showAlert('Erreur: ' + error.message, 'danger');
+            }
+        }
+
+        function cancelIntervention() {
+            if (confirm('Êtes-vous sûr de vouloir annuler cette intervention?')) {
+                appState.currentFile = null;
+                elements.interventionForm.classList.add('hide');
+                elements.interventionDetails.classList.remove('hide');
+                switchTab('Emails');
+                showAlert('Intervention annulée.', 'info');
+            }
+        }
+
+        // Utilitaires
+        function setCurrentTimeStart() {
+            const now = new Date();
+            elements.startDay.value = now.getDate();
+            elements.startMonth.value = now.getMonth() + 1;
+            elements.startHour.value = now.getHours();
+            elements.startMinute.value = now.getMinutes();
+            showAlert('Heure de début définie à l\'heure actuelle.', 'info');
+        }
+
+        function setCurrentTimeEnd() {
+            const now = new Date();
+            elements.endDay.value = now.getDate();
+            elements.endMonth.value = now.getMonth() + 1;
+            elements.endHour.value = now.getHours();
+            elements.endMinute.value = now.getMinutes();
+            showAlert('Heure de fin définie à l\'heure actuelle.', 'info');
+        }
+
+        function saveConfiguration() {
+            appState.config.targetEmail = elements.targetEmail.value;
+            appState.config.filePrefix = elements.filePrefix.value;
+            localStorage.setItem('appConfig', JSON.stringify(appState.config));
+            showAlert('Configuration enregistrée.', 'success');
+        }
+
+        function switchTab(tabName) {
+            // Masquer tous les contenus
+            elements.contentEmails.classList.remove('active');
+            elements.contentIntervention.classList.remove('active');
+            elements.contentConfig.classList.remove('active');
+            
+            // Désactiver tous les onglets
+            elements.tabEmails.classList.remove('active');
+            elements.tabIntervention.classList.remove('active');
+            elements.tabConfig.classList.remove('active');
+            
+            // Activer l'onglet et le contenu sélectionnés
+            elements[`tab${tabName}`].classList.add('active');
+            elements[`content${tabName}`].classList.add('active');
+        }
+
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type}`;
+            alertDiv.textContent = message;
+            
+            elements.alertContainer.innerHTML = '';
+            elements.alertContainer.appendChild(alertDiv);
+            
+            // Auto-disparition après 5 secondes
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' bytes';
+            if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / 1048576).toFixed(1) + ' MB';
+        }
+
+        // Initialisation de l'application
+        window.onload = init;
+
+        // Fonctions globales pour les boutons dans la liste d'emails
+        window.downloadAttachment = downloadAttachment;
+        window.acceptIntervention = acceptIntervention;
+        window.rejectIntervention = rejectIntervention;
+    </script>
+</body>
+</html>
