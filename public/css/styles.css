@@ -1,0 +1,464 @@
+:root {
+    /* Palette de couleurs Securitas Technology */
+    --securitas-navy: #00205c;
+    --securitas-red: #e31837;
+    --securitas-light: #f5f7fa;
+    --securitas-gray: #6c757d;
+    --securitas-border: #dee2e6;
+    --securitas-success: #28a745;
+    --securitas-warning: #ffc107;
+    --text-color: #333333;
+}
+
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--securitas-light);
+    color: var(--text-color);
+}
+
+/* Container principal */
+.app-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-bottom: 20px;
+}
+
+/* En-tête de l'application */
+.securitas-header {
+    background-color: var(--securitas-navy);
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+}
+
+.brand-logo {
+    height: 40px;
+    margin-right: 15px;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.user-badge {
+    background-color: rgba(255, 255, 255, 0.2);
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+/* Composants d'alertes */
+.alert-container {
+    margin: 0 20px 20px 20px;
+}
+
+.alert {
+    padding: 12px 15px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+/* Navigation par onglets */
+.tabs-container {
+    margin: 0 20px;
+}
+
+.tabs {
+    display: flex;
+    border-bottom: 1px solid var(--securitas-border);
+    margin-bottom: 20px;
+}
+
+.tab {
+    padding: 12px 20px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    border-radius: 4px 4px 0 0;
+    margin-right: 5px;
+    background-color: #f1f1f1;
+    color: var(--securitas-navy);
+    font-weight: 500;
+}
+
+.tab.active {
+    background-color: var(--securitas-navy);
+    color: white;
+    font-weight: 600;
+    border: 1px solid var(--securitas-navy);
+}
+
+.tab-content {
+    display: none;
+    padding: 20px;
+    border: 1px solid var(--securitas-border);
+    border-radius: 0 0 4px 4px;
+    background-color: white;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Composants communs */
+.btn {
+    display: inline-block;
+    font-weight: 500;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    border: 1px solid transparent;
+    padding: 8px 16px;
+    font-size: 14px;
+    line-height: 1.5;
+    border-radius: 4px;
+    transition: all 0.15s ease-in-out;
+}
+
+.btn-primary {
+    background-color: var(--securitas-navy);
+    border-color: var(--securitas-navy);
+    color: white;
+}
+
+.btn-secondary {
+    background-color: var(--securitas-gray);
+    border-color: var(--securitas-gray);
+    color: white;
+}
+
+.btn-mail {
+    background-color: var(--securitas-red);
+    border-color: var(--securitas-red);
+    color: white;
+}
+
+.btn-light {
+    background-color: white;
+    border-color: var(--securitas-border);
+    color: var(--securitas-navy);
+}
+
+.btn-now {
+    height: 38px;
+    background-color: var(--securitas-navy);
+    color: white;
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+
+.form-control {
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--text-color);
+    background-color: white;
+    border: 1px solid var(--securitas-border);
+    border-radius: 4px;
+    transition: border-color 0.15s ease-in-out;
+    box-sizing: border-box;
+}
+
+.form-control:focus {
+    border-color: var(--securitas-navy);
+    outline: 0;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--securitas-navy);
+}
+
+.section-title {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: var(--securitas-navy);
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.hide {
+    display: none !important;
+}
+
+/* Liste d'emails */
+.email-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.email-item {
+    background-color: white;
+    border: 1px solid var(--securitas-border);
+    border-radius: 4px;
+    margin-bottom: 15px;
+    overflow: hidden;
+}
+
+.email-item.active {
+    border-color: var(--securitas-navy);
+    background-color: #cce5ff;
+}
+
+.email-header {
+    padding: 12px 15px;
+    background-color: var(--securitas-light);
+    border-bottom: 1px solid var(--securitas-border);
+}
+
+.email-item.active .email-header {
+    background-color: var(--securitas-navy);
+    color: white;
+}
+
+.email-subject {
+    font-weight: 600;
+    margin: 0 0 5px 0;
+    color: var(--securitas-navy);
+}
+
+.email-item.active .email-subject {
+    color: white;
+}
+
+.email-meta {
+    font-size: 12px;
+    color: var(--securitas-gray);
+}
+
+.email-item.active .email-meta {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.email-body {
+    padding: 12px 15px;
+}
+
+.email-actions {
+    padding: 10px 15px;
+    background-color: #f8f9fa;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* Formulaire d'intervention */
+.intervention-message {
+    padding: 20px;
+    background-color: var(--securitas-light);
+    border-radius: 4px;
+    text-align: center;
+    color: var(--securitas-gray);
+}
+
+.intervention-details {
+    background-color: #f8f9fa;
+    border: 1px solid var(--securitas-border);
+    border-radius: 4px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.intervention-details h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 16px;
+    color: var(--securitas-navy);
+}
+
+.detail-item {
+    margin-bottom: 8px;
+}
+
+.detail-label {
+    font-weight: 500;
+    display: inline-block;
+    min-width: 120px;
+}
+
+.date-time-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-start;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+/* Conteneur mailto */
+.mailto-container {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.mailto-container h3 {
+    margin-top: 0;
+    color: var(--securitas-navy);
+}
+
+.mailto-steps {
+    margin-bottom: 20px;
+}
+
+.mailto-btn {
+    display: inline-block;
+    margin: 10px 0;
+}
+
+/* Page de connexion */
+.login-container {
+    max-width: 400px;
+    margin: 100px auto;
+    padding: 30px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+}
+
+.login-logo {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.login-logo img {
+    height: 60px;
+}
+
+.login-title {
+    text-align: center;
+    color: var(--securitas-navy);
+    margin-bottom: 30px;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.login-input {
+    margin-bottom: 20px;
+    padding: 12px;
+    border: 1px solid var(--securitas-border);
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.login-btn {
+    padding: 12px;
+    background-color: var(--securitas-navy);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+.login-error {
+    color: var(--securitas-red);
+    margin-top: 15px;
+    text-align: center;
+    display: none;
+}
+
+/* Animation de chargement */
+.loader {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid var(--securitas-navy);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 2s linear infinite;
+    margin: 20px auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Styles responsives */
+@media (max-width: 768px) {
+    .securitas-header {
+        flex-direction: column;
+        padding: 15px;
+    }
+    
+    .header-actions {
+        margin-top: 15px;
+    }
+    
+    .date-time-group {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .date-time-group .btn {
+        margin-top: 10px;
+        align-self: flex-end;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .form-actions .btn {
+        width: 100%;
+    }
+}
